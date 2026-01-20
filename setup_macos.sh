@@ -50,58 +50,59 @@ source venv/bin/activate
 echo "Upgrading pip..."
 pip install --upgrade pip
 
-# Install macOS-specific requirements
+# Install Python dependencies for macOS (NO CUDA!)
 echo "Installing Python dependencies for macOS..."
-if [ -f "requirements-macos.txt" ]; then
-    pip install -r requirements-macos.txt
-else
-    # Fallback: install packages manually if requirements-macos.txt doesn't exist
-    echo "requirements-macos.txt not found, installing manually..."
-    pip install numpy>=1.23.5 typing-extensions>=4.8.0
-    pip install opencv-python==4.10.0.84
-    pip install cv2_enumerate_cameras==1.1.15
-    pip install onnx==1.18.0
-    pip install insightface==0.7.3
-    pip install psutil==5.9.8
-    pip install tk==0.1.0
-    pip install customtkinter==5.2.2
-    pip install pillow==11.1.0
-    pip install torch torchvision
-    pip install onnxruntime-silicon==1.16.3
-    pip install opennsfw2==0.10.2
-    pip install protobuf==4.25.1
-    pip install git+https://github.com/xinntao/BasicSR.git@master
-    pip install git+https://github.com/TencentARC/GFPGAN.git@master
-fi
+echo "Step 1/8: Core packages..."
+pip install "numpy>=1.23.5,<2" "typing-extensions>=4.8.0"
+
+echo "Step 2/8: OpenCV..."
+pip install opencv-python==4.10.0.84 cv2_enumerate_cameras==1.1.15
+
+echo "Step 3/8: ONNX and InsightFace..."
+pip install onnx==1.18.0 insightface==0.7.3
+
+echo "Step 4/8: GUI packages..."
+pip install psutil==5.9.8 tk==0.1.0 customtkinter==5.2.2 pillow==11.1.0
+
+echo "Step 5/8: PyTorch for macOS (no CUDA)..."
+pip install torch torchvision
+
+echo "Step 6/8: ONNX Runtime for Apple Silicon..."
+pip install onnxruntime-silicon==1.16.3
+
+echo "Step 7/8: Additional packages..."
+pip install opennsfw2==0.10.2 protobuf==4.25.1
+
+echo "Step 8/8: BasicSR and GFPGAN..."
+pip install git+https://github.com/xinntao/BasicSR.git@master
+pip install git+https://github.com/TencentARC/GFPGAN.git@master
 
 # Download models
+echo ""
 echo "Downloading AI models..."
 mkdir -p models
 
 if [ ! -f "models/GFPGANv1.4.pth" ]; then
-    echo "   Downloading GFPGANv1.4.pth..."
+    echo "   Downloading GFPGANv1.4.pth (~350MB)..."
     curl -L -o models/GFPGANv1.4.pth \
         "https://huggingface.co/hacksider/deep-live-cam/resolve/main/GFPGANv1.4.pth"
 fi
 
 if [ ! -f "models/inswapper_128_fp16.onnx" ]; then
-    echo "   Downloading inswapper_128_fp16.onnx..."
+    echo "   Downloading inswapper_128_fp16.onnx (~250MB)..."
     curl -L -o models/inswapper_128_fp16.onnx \
         "https://huggingface.co/hacksider/deep-live-cam/resolve/main/inswapper_128_fp16.onnx"
 fi
 
 echo ""
-echo "Setup complete!"
-echo ""
 echo "========================================="
+echo "Setup complete!"
+echo "========================================="
+echo ""
 echo "To run Deep-Live-Cam:"
 echo ""
-echo "  1. Activate the virtual environment:"
-echo "     source venv/bin/activate"
+echo "  source venv/bin/activate"
+echo "  python run.py --execution-provider coreml"
 echo ""
-echo "  2. Run with CoreML acceleration:"
-echo "     python run.py --execution-provider coreml"
-echo ""
-echo "  Or simply run:"
-echo "     ./run_macos.sh"
+echo "Or simply run: ./run_macos.sh"
 echo "========================================="
