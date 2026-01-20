@@ -69,6 +69,8 @@ pip install torch torchvision
 
 echo "Step 6/8: ONNX Runtime for Apple Silicon..."
 pip install onnxruntime-silicon==1.16.3
+# Force NumPy 1.x (onnxruntime-silicon is not compatible with NumPy 2.x)
+pip install "numpy>=1.23.5,<2" --force-reinstall
 
 echo "Step 7/8: Additional packages..."
 pip install opennsfw2==0.10.2 protobuf==4.25.1
